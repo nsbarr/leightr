@@ -15,6 +15,10 @@
 		01465AA019FD918800401939 /* l8r_hackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01465A9F19FD918800401939 /* l8r_hackTests.swift */; };
 		01681E471A40B9C5002D70B3 /* OverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01681E461A40B9C5002D70B3 /* OverlayView.xib */; };
 		019462461A3FC02200D8BC05 /* coffee.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 019462451A3FC02200D8BC05 /* coffee.jpg */; };
+		780510F71A4CE0A7008140C4 /* snapbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 780510F61A4CE0A7008140C4 /* snapbutton.png */; };
+		780510F91A4CF32D008140C4 /* oldvc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780510F81A4CF32D008140C4 /* oldvc.swift */; };
+		787227621A5AEB54001AE19F /* chevron.png in Resources */ = {isa = PBXBuildFile; fileRef = 787227611A5AEB54001AE19F /* chevron.png */; };
+		78F2CE771A43245200CFE9DB /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 78F2CE761A43245200CFE9DB /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +44,10 @@
 		01465A9F19FD918800401939 /* l8r_hackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = l8r_hackTests.swift; sourceTree = "<group>"; };
 		01681E461A40B9C5002D70B3 /* OverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OverlayView.xib; sourceTree = "<group>"; };
 		019462451A3FC02200D8BC05 /* coffee.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = coffee.jpg; sourceTree = "<group>"; };
+		780510F61A4CE0A7008140C4 /* snapbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = snapbutton.png; sourceTree = "<group>"; };
+		780510F81A4CF32D008140C4 /* oldvc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = oldvc.swift; sourceTree = "<group>"; };
+		787227611A5AEB54001AE19F /* chevron.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chevron.png; sourceTree = "<group>"; };
+		78F2CE761A43245200CFE9DB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,9 +71,11 @@
 		01465A7B19FD918800401939 = {
 			isa = PBXGroup;
 			children = (
+				78F2CE761A43245200CFE9DB /* Default-568h@2x.png */,
 				01465A8619FD918800401939 /* l8r_hack */,
 				01465A9C19FD918800401939 /* l8r_hackTests */,
 				01465A8519FD918800401939 /* Products */,
+				780510F61A4CE0A7008140C4 /* snapbutton.png */,
 			);
 			sourceTree = "<group>";
 		};
@@ -83,7 +93,9 @@
 			children = (
 				019462451A3FC02200D8BC05 /* coffee.jpg */,
 				01465A8919FD918800401939 /* AppDelegate.swift */,
+				787227611A5AEB54001AE19F /* chevron.png */,
 				01465A8B19FD918800401939 /* ViewController.swift */,
+				780510F81A4CF32D008140C4 /* oldvc.swift */,
 				01681E461A40B9C5002D70B3 /* OverlayView.xib */,
 				01465A8D19FD918800401939 /* Main.storyboard */,
 				01465A9019FD918800401939 /* Images.xcassets */,
@@ -167,6 +179,7 @@
 				TargetAttributes = {
 					01465A8319FD918800401939 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = 3RA98GNA2A;
 					};
 					01465A9819FD918800401939 = {
 						CreatedOnToolsVersion = 6.1;
@@ -201,8 +214,11 @@
 				01465A8F19FD918800401939 /* Main.storyboard in Resources */,
 				019462461A3FC02200D8BC05 /* coffee.jpg in Resources */,
 				01681E471A40B9C5002D70B3 /* OverlayView.xib in Resources */,
+				787227621A5AEB54001AE19F /* chevron.png in Resources */,
 				01465A9419FD918800401939 /* LaunchScreen.xib in Resources */,
 				01465A9119FD918800401939 /* Images.xcassets in Resources */,
+				78F2CE771A43245200CFE9DB /* Default-568h@2x.png in Resources */,
+				780510F71A4CE0A7008140C4 /* snapbutton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +237,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				01465A8C19FD918800401939 /* ViewController.swift in Sources */,
+				780510F91A4CF32D008140C4 /* oldvc.swift in Sources */,
 				01465A8A19FD918800401939 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -280,7 +297,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -300,6 +318,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "9f1ddd32-2ea7-41cb-b59a-4ce23999dd67";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -322,7 +341,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -335,6 +355,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE = "9f1ddd32-2ea7-41cb-b59a-4ce23999dd67";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -344,9 +365,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = l8r_hack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -354,9 +378,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = l8r_hack/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
@@ -364,6 +391,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -375,6 +403,7 @@
 				INFOPLIST_FILE = l8r_hackTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "9f1ddd32-2ea7-41cb-b59a-4ce23999dd67";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/l8r_hack.app/l8r_hack";
 			};
 			name = Debug;
@@ -383,6 +412,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nicholas Barr (P9CU9G69N8)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -390,6 +420,7 @@
 				INFOPLIST_FILE = l8r_hackTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "9f1ddd32-2ea7-41cb-b59a-4ce23999dd67";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/l8r_hack.app/l8r_hack";
 			};
 			name = Release;

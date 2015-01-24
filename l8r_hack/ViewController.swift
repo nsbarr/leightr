@@ -21,16 +21,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
     var animator:UIDynamicAnimator!
     var scheduleText:UILabel!
     var calendarPicker:UIView!
+    var imageView:UIView!
     var calendarPickerLabel:UILabel!
     let imagePickerController = UIImagePickerController()
+    var didTakePicture = false
+    var okButton: UIButton!
+    var isSavingPictures = false
     
     
-    
-    @IBOutlet var cameraButton: UIButton!
     @IBOutlet var handlePan: UIPanGestureRecognizer!
+    @IBOutlet var handleTap: UITapGestureRecognizer!
     
     @IBOutlet var overlayView: UIView!
-    @IBOutlet var snapButton: UIButton!
     
     
     @IBAction func showImagePicker(sender: UIButton) {
@@ -39,10 +41,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
     }
     
     
-    @IBAction func snapPhoto(sender: UIButton){
-       // [self.imagePickerController takePicture];
-        self.imagePickerController.takePicture()
+    
+    
+    @IBAction func handleTap(sender: UITapGestureRecognizer) {
+        sender.delegate = self
+        println("tap")
+        tappedPoint = sender.locationInView(view)
+        tappedView = view.hitTest(tappedPoint, withEvent: nil)
+        if (snap != nil) {
+            animator.removeBehavior(snap)
+        }
+        if (tappedView == circleView && !didTakePicture){
+            println("circleview was tapped")
+            self.takePicture()
+        }
     }
+
     
 
     @IBAction func handlePan(sender: UIPanGestureRecognizer) {
@@ -59,10 +73,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         }
         
         if (tappedView == circleView && sender.state == .Changed) {
+
+            view.addSubview(calendarPicker)
+            calendarPicker.addSubview(calendarPickerLabel)
+            
+            print("y position is \(circleView.frame.origin.y)")
+
             let translation = sender.translationInView(view)
             circleView.center = CGPointMake(circleView.center.x, circleView.center.y + translation.y)
             sender.setTranslation(CGPointMake(0,0), inView: view)
+            if didTakePicture{
+                self.imageView.center = self.circleView.center
+            }
             self.updateScheduleText()
+            if ((circleView.frame.origin.y > 460 || circleView.frame.origin.y < 380) && !didTakePicture){
+                
+                println("takingPicture")
+                self.takePicture()
+            }
             
             if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame)) {
                 println("overlap")
@@ -75,31 +103,101 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         }
         
         if (tappedView == circleView && sender.state == .Ended) {
-                println("ended")
+            
+            println("ended")
+            
             if (snap != nil) {
                 animator.removeBehavior(snap)
             }
-            if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame) == false && circleView.frame.origin.y > view.frame.height-200) {
-                snap = UISnapBehavior(item: circleView, snapToPoint: originalCirclePoint)
-                scheduleText.text = ""
+            
+            if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame) == true){
+                snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(0 + circleView.frame.width, view.frame.height - circleView.frame.height))
+                snap.damping = 0.8
+                animator.addBehavior(snap)
+                
+                okButton = UIButton(frame: CGRectMake(calendarPicker.frame.width-44,calendarPicker.frame.height-44, 44, 44))
+                okButton.addTarget(self, action: Selector("schedulePhoto:"), forControlEvents:UIControlEvents.TouchUpInside)
+                okButton.backgroundColor = UIColor.blackColor()
+                okButton.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 18.0)
+                okButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+                okButton.setTitle("Ok", forState: UIControlState.Normal)
+                calendarPicker.addSubview(okButton)
             }
             
-            else if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame) == false){
-                snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(view.frame.width - circleView.frame.width, circleView.frame.height))
-            }
+            else if (circleView.frame.origin.y < 370) { //schedule
+                println("snapping up")
                 
-            else {
-                snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(0 + circleView.frame.width, view.frame.height - circleView.frame.height))
-                scheduleText.text = ""
+                snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(view.frame.width-44, scheduleText.frame.origin.y+circleView.frame.height/2))
+                snap.damping = 0.8
+                animator.addBehavior(snap)
+                self.confirmSchedule()
+                
             }
-            snap.damping = 0.8
-            animator.addBehavior(snap)
-    
+            
+            else {
+                snap = UISnapBehavior(item: circleView, snapToPoint: originalCirclePoint)
+                snap.damping = 0.8
+                animator.addBehavior(snap)
+            }
+
         }
-    
     
     }
     
+    func confirmSchedule(){
+        println("confirmingSchedule")
+        var scheduleTextNewFrame = self.scheduleText.frame
+        scheduleTextNewFrame.origin.y = -scheduleTextNewFrame.size.height
+        
+//        var circleViewNewFrame = CGRect(x: view.frame.width-44, y: scheduleText.frame.origin.y+circleView.frame.height/2, width: circleRadius*2, height: circleRadius*2)
+//        circleViewNewFrame.origin.y = -500
+//        
+
+        UIView.animateWithDuration(0.6, delay: 0.8, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            
+            
+//            if (self.snap != nil) {
+//                self.animator.removeBehavior(self.snap)
+//            }
+
+            
+       //     self.circleView.frame.origin.y = -100
+            self.circleView.alpha = 0
+            
+            
+            self.scheduleText.frame = scheduleTextNewFrame
+            self.scheduleText.alpha = 0.3
+            
+            }, completion: {(value: Bool) in
+            self.calendarPicker.removeFromSuperview()
+            self.calendarPickerLabel.removeFromSuperview()
+            self.showCameraView()
+            self.scheduleText.alpha = 1
+            self.didTakePicture = false
+        
+                })
+    }
+    
+
+
+    
+    func schedulePhoto(sender: UIButton){
+        println("scheduling")
+        if (snap != nil) {
+            animator.removeBehavior(snap)
+        }
+        self.shrinkCalendarPicker()
+        circleView.removeFromSuperview()
+        okButton.removeFromSuperview()
+        calendarPicker.removeFromSuperview()
+        calendarPickerLabel.removeFromSuperview()
+
+
+        didTakePicture = false
+        
+        self.showCameraView()
+        
+    }
     
     func showImagePickerForSourceType(sourceType: UIImagePickerControllerSourceType){
         
@@ -112,66 +210,51 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         
         if (sourceType == UIImagePickerControllerSourceType.Camera){
             
-            let imagePickerControllerFrame = CGRectMake(0, self.view.frame.width, self.view.frame.width, self.view.frame.height-self.view.frame.width)
-            let imageView = imagePickerController.view
-            imageView.frame = imagePickerControllerFrame;
-            
-            view.addSubview(imageView)
             
             imagePickerController.showsCameraControls = false
-            NSBundle.mainBundle().loadNibNamed("OverlayView", owner: self, options: nil)
-            self.overlayView.frame = CGRectMake(0, imagePickerController.cameraOverlayView!.frame.width, imagePickerController.cameraOverlayView!.frame.width, imagePickerController.cameraOverlayView!.frame.height-self.view.frame.width)
+            
+            self.overlayView.frame = CGRectMake(0, imagePickerController.cameraOverlayView!.frame.width, imagePickerController.cameraOverlayView!.frame.width, imagePickerController.cameraOverlayView!.frame.height)//-self.view.frame.width)
+            self.overlayView.backgroundColor = UIColor.redColor()
         
             imagePickerController.cameraOverlayView = self.overlayView
             self.overlayView = nil
-            
-            let controllerView = imagePickerController.view
-        
 
-            
-            
-            
-            
-//            
-//            let overlayView = UIView(frame: CGRectMake(0, self.view.frame.width, self.view.frame.width, self.view.frame.height-self.view.frame.width))
-//            overlayView.backgroundColor = UIColor.whiteColor()
-//            overlayView.userInteractionEnabled = true
-//            overlayView.alpha = 1.0 // tried this to make sure subview wasn't hiding behind
-//            println(overlayView)
-//            
-            
-//            let snapButton = UIButton(frame: CGRectMake(self.view.frame.width/2-22, self.view.frame.height-200, 44, 44))
-//            snapButton.addTarget(self, action: Selector("snapPhoto:"), forControlEvents:UIControlEvents.TouchUpInside)
-//            snapButton.backgroundColor = UIColor.blackColor()
-//            snapButton.setTitle("Snap", forState: UIControlState.Normal)
-//            overlayView.addSubview(snapButton)
-            
-//            let snapButton = UIButton(frame: CGRectMake(self.view.frame.width/2-22, self.view.frame.height-200, 44, 44))
-//            snapButton.layer.cornerRadius = 22
-//            snapButton.userInteractionEnabled = true
-//            snapButton.backgroundColor = UIColor.blackColor()
-            
-    
             
         }
         self.presentViewController(self.imagePickerController, animated: true, completion: nil)
+        
+        
+
     }
+    
+    func takePicture(){
+            self.imagePickerController.takePicture()
+            self.imageView.layer.cornerRadius = self.circleRadius
+            self.imageView.clipsToBounds = true
+            circleView.alpha = 0.0
+        
+        
+            
+        UIView.animateWithDuration(0.2, animations: { () -> Void in
+            self.imageView.frame.size = self.circleView.frame.size
+            self.imageView.center = self.circleView.center
+            
+                }, completion:nil)
+           didTakePicture = true
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSBundle.mainBundle().loadNibNamed("OverlayView", owner: self, options: nil)
+        
+        
         // Do any additional setup after loading the view, typically from a nib.
         
-        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-180, width: circleRadius*2, height: circleRadius*2))
-        circleView.clipsToBounds = true
-        circleView.image = UIImage(named: "coffee.jpg")
-        circleView.layer.cornerRadius = circleRadius
-        circleView.userInteractionEnabled = true
-        circleView.layer.zPosition = 10
-        originalCirclePoint = circleView.center
-        view.addSubview(circleView)
+
         
-        scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
-        view.addSubview(scheduleText)
+
         
         calendarPicker = UIView(frame: CGRect(x:0, y:view.frame.height-60, width:self.view.frame.width, height:60))
         calendarPicker.backgroundColor = UIColor.blackColor()
@@ -187,43 +270,88 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         
         
         
-        view.addSubview(calendarPicker)
-        calendarPicker.addSubview(calendarPickerLabel)
+        
         
         
         animator = UIDynamicAnimator(referenceView: view)
+        
+      //  [[[[UIApplication sharedApplication] delegate] window] addSubview:controllerView];
+        
+        view.backgroundColor = UIColor.whiteColor()
+        view.alpha = 1.0
+        
+        self.showCameraView()
+        self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
+
+        
+
     }
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
      //   let image = info(valueForKeyPath(UIImagePickerControllerOriginalImage))
         let tempImage = info[UIImagePickerControllerOriginalImage] as UIImage
-        UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
+        
+        if isSavingPictures {
+            UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
+        }
+        circleView.image = tempImage
+        circleView.alpha = 1.0
+        imageView.removeFromSuperview()
+        
     }
     
-    
+    func showCameraView(){
+        
+        if (scheduleText != nil){
+            scheduleText.removeFromSuperview()
+        }
+        
+        if (circleView != nil){
+            circleView.removeFromSuperview()
+        }
+        
+        println("showing cam")
+        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.width)
+        imageView = imagePickerController.view
+        imageView.frame = imagePickerControllerFrame;
+        imageView.layer.cornerRadius = 0
+        
+        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-240, width: circleRadius*2, height: circleRadius*2))
+        circleView.clipsToBounds = true
+        circleView.image = UIImage(named: "snapbutton.png")
+        circleView.layer.cornerRadius = circleRadius
+        circleView.userInteractionEnabled = true
+        circleView.layer.zPosition = 10
+        circleView.alpha = 1
+        originalCirclePoint = circleView.center
+        
+        scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
+        
+        
+        view.addSubview(circleView)
+        view.addSubview(imageView)
+        view.addSubview(scheduleText)
+    }
     
     func updateScheduleText(){
         
-        if circleView.frame.origin.y > view.frame.height-200 {
-            scheduleText.text = ""
-        }
-        else if circleView.frame.origin.y > view.frame.height-300 {
-            scheduleText.text = "In a few hours"
-        }
-        else if circleView.frame.origin.y > view.frame.height - 400 {
-            scheduleText.text = "Tomorrow"
-        }
-        else if circleView.frame.origin.y > view.frame.height - 500 {
-            scheduleText.text = "Next Week"
-        }
-        else if circleView.frame.origin.y > view.frame.height - 600 {
-            scheduleText.text = "Next Month"
-        }
-        else {
+        if circleView.frame.origin.y < 260 {
             scheduleText.text = "In a year"
         }
-        
-        
+        else if circleView.frame.origin.y < 300 {
+            scheduleText.text = "Next Month"
+        }
+        else if circleView.frame.origin.y < 340 {
+            scheduleText.text = "Next Week"
+        }
+        else if circleView.frame.origin.y < 380 {
+            scheduleText.text = "Tomorrow"
+        }
+        else if circleView.frame.origin.y < 420 {
+            scheduleText.text = ""
+        }
+
+
         scheduleText.font = UIFont(name: "ArialRoundedMTBold", size: 40.0)
         scheduleText.textColor = UIColor.blackColor()
         scheduleText.sizeToFit()
@@ -242,9 +370,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         calendarPickerLabel.textAlignment = NSTextAlignment.Center
         calendarPickerLabel.center.x = calendarPicker.center.x
         
-
     }
     
+
     func growCalendarPicker(){
         println("growing")
         var newFrame = CGRect(x:0, y:view.frame.height-200, width:self.view.frame.width, height:200)
@@ -254,12 +382,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UIImagePick
         calendarPickerLabel.sizeToFit()
         calendarPickerLabel.textAlignment = NSTextAlignment.Center
         calendarPickerLabel.center.x = calendarPicker.center.x
-
+        
+        scheduleText.text = ""
 
     }
 
-
-    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

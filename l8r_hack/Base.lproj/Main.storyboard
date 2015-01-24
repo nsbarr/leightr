@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14A238x" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
@@ -15,26 +15,16 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iwu-f7-Xg7">
-                                <rect key="frame" x="9" y="0.0" width="54" height="30"/>
-                                <state key="normal" title="Camera">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="showImagePicker:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="0rJ-9f-35F"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="Ya1-uQ-flw" appends="YES" id="npv-g4-x5x"/>
+                            <outletCollection property="gestureRecognizers" destination="HpN-f1-VGf" appends="YES" id="diB-6K-bqB"/>
                         </connections>
                     </view>
                     <connections>
-                        <outlet property="cameraButton" destination="iwu-f7-Xg7" id="TZs-oI-f37"/>
                         <outlet property="handlePan" destination="Ya1-uQ-flw" id="1UF-et-cwW"/>
+                        <outlet property="handleTap" destination="HpN-f1-VGf" id="qsp-aP-8Zp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
@@ -43,6 +33,11 @@
                         <action selector="handlePan:" destination="vXZ-lx-hvc" id="tAj-EY-yKx"/>
                     </connections>
                 </panGestureRecognizer>
+                <tapGestureRecognizer id="HpN-f1-VGf">
+                    <connections>
+                        <action selector="handleTap:" destination="vXZ-lx-hvc" id="9qH-wN-Yqw"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
         </scene>
     </scenes>
