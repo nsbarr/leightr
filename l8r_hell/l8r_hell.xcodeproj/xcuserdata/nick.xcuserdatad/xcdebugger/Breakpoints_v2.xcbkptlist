@@ -33,6 +33,52 @@
             endingLineNumber = "4"
             landmarkName = "PageViewController"
             landmarkType = "3">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "l8r_hell.PageViewController.__deallocating_deinit"
+                  moduleName = "l8r_hell"
+                  urlString = "file:///Users/nick/Desktop/personal-dev/l8r_hell/l8r_hell/PageViewController.swift"
+                  timestampString = "444088461.463413"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "4"
+                  endingLineNumber = "4"
+                  offsetFromSymbolStart = "16">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "@objc l8r_hell.PageViewController.__ivar_destroyer"
+                  moduleName = "l8r_hell"
+                  urlString = "file:///Users/nick/Desktop/personal-dev/l8r_hell/l8r_hell/PageViewController.swift"
+                  timestampString = "444088461.463616"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "4"
+                  endingLineNumber = "4"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "l8r_hell/InboxViewController.swift"
+            timestampString = "444088383.154047"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

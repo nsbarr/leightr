@@ -13,6 +13,8 @@ class InboxViewController: UIViewController {
     
     @IBOutlet var cameraButton: UIButton!
     
+    @IBOutlet var theImageView: UIImageView!
+    
     
     @IBAction func cameraButtonTapped(sender: UIButton){
         
@@ -26,5 +28,15 @@ class InboxViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         println("inboxViewLoaded")
+        
+        
+        let theImagePath = NSUserDefaults.standardUserDefaults().objectForKey("imagePath") as NSString
+        
+        theImageView.image = UIImage(contentsOfFile: theImagePath)
+        
+        view.addSubview(theImageView)
+       
+        
+        
     }
 }

@@ -29,7 +29,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var animator:UIDynamicAnimator!
     
     var didTakePicture = false
-    var isSavingPictures = false
+    var isSavingPictures = true
     
     var calendarPickerLabel:UILabel!
     var calendarPicker:UIView!
@@ -341,9 +341,26 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         //   let image = info(valueForKeyPath(UIImagePickerControllerOriginalImage))
         let tempImage = info[UIImagePickerControllerOriginalImage] as UIImage
         
+
+        
+        let imageData = UIImageJPEGRepresentation(tempImage, 1.0)
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString
+        let imagePath = paths.stringByAppendingPathComponent("cached.png")
+        
+        println(imagePath)
+        if !imageData.writeToFile(imagePath, atomically: false){
+            println("not saved")
+        }
+        else {
+            println("saved")
+            NSUserDefaults.standardUserDefaults().setObject(imagePath, forKey: "imagePath")
+        }
+        
         if isSavingPictures {
             UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
         }
+        
+        
         circleView.image = tempImage
         circleView.alpha = 1.0
         imageView.removeFromSuperview()
