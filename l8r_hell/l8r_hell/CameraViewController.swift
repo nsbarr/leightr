@@ -34,6 +34,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var calendarPickerLabel:UILabel!
     var calendarPicker:UIView!
     var okButton: UIButton!
+    
+    var scheduledDate: NSDate!
 
 
 
@@ -52,6 +54,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.showCameraView()
         self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
         self.setUpCalendar()
+        
+        setupNotificationSettings()
         
         
         println(self.view.gestureRecognizers)
@@ -206,7 +210,10 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         if (snap != nil) {
             animator.removeBehavior(snap)
         }
+        
+
         self.shrinkCalendarPicker()
+        
 
         
         didTakePicture = false
@@ -419,8 +426,74 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 self.didTakePicture = false
                 
         })
+        
+        self.scheduleLocalNotification()
+        
     }
     
+ 
+    
+    func setupNotificationSettings() {
+        
+        let notificationSettings: UIUserNotificationSettings! = UIApplication.sharedApplication().currentUserNotificationSettings()
+        
+        if (notificationSettings.types == UIUserNotificationType.None){
+
+            var notificationTypes: UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Sound
+            
+            var ignoreAction = UIMutableUserNotificationAction()
+            ignoreAction.identifier = "ignore"
+            ignoreAction.title = "Ignore"
+            ignoreAction.activationMode = UIUserNotificationActivationMode.Background
+            ignoreAction.destructive = false
+            ignoreAction.authenticationRequired = false
+            
+            var modifyListAction = UIMutableUserNotificationAction()
+            modifyListAction.identifier = "view"
+            modifyListAction.title = "View"
+            modifyListAction.activationMode = UIUserNotificationActivationMode.Foreground
+            modifyListAction.destructive = false
+            modifyListAction.authenticationRequired = true
+            
+            let actionsArray = NSArray(objects: ignoreAction, modifyListAction)
+            let actionsArrayMinimal = NSArray(objects: ignoreAction, modifyListAction)
+            
+            var shoppingListReminderCategory = UIMutableUserNotificationCategory()
+            shoppingListReminderCategory.identifier = "shoppingListReminderCategory"
+            shoppingListReminderCategory.setActions(actionsArray, forContext: UIUserNotificationActionContext.Default)
+            shoppingListReminderCategory.setActions(actionsArrayMinimal, forContext: UIUserNotificationActionContext.Minimal)
+        
+
+        //   convenience init(forTypes allowedUserNotificationTypes: UIUserNotificationType, categories actionSettings: NSSet?)
+        
+        
+            let categoriesForSettings = NSSet(objects: shoppingListReminderCategory)
+        
+        
+            let newNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: categoriesForSettings)
+        
+            UIApplication.sharedApplication().registerUserNotificationSettings(newNotificationSettings)
+        }
+    }
+    
+    func scheduleLocalNotification() {
+        
+        var currentTime = NSDate()
+        var timeComponent = NSDateComponents()
+        timeComponent.second = 20
+        var theCalendar = NSCalendar.currentCalendar()
+        var scheduledDate = theCalendar.dateByAddingComponents(timeComponent, toDate: currentTime, options: NSCalendarOptions(0))
+        
+        var localNotification = UILocalNotification()
+        localNotification.fireDate = scheduledDate
+        localNotification.alertBody = "Your l8r is now"
+        localNotification.alertAction = "View"
+        localNotification.category = "shoppingListReminderCategory"
+        UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
+            
+    }
+
+
     
     func swipeView(sender: UIButton){
         let pvc = self.storyboard!.instantiateViewControllerWithIdentifier("PageViewController") as PageViewController
