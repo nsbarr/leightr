@@ -29,13 +29,15 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var animator:UIDynamicAnimator!
     
     var didTakePicture = false
-    var isSavingPictures = true
+    var isSavingPictures = false
     
     var calendarPickerLabel:UILabel!
     var calendarPicker:UIView!
     var okButton: UIButton!
     
     var scheduledDate: NSDate!
+    
+    var backgroundImageView: UIImageView!
 
 
 
@@ -98,6 +100,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             
             let translation = sender.translationInView(view)
             circleView.center = CGPointMake(circleView.center.x, circleView.center.y + translation.y)
+            backgroundImageView.center = CGPointMake(backgroundImageView.center.x, backgroundImageView.center.y - translation.y*2.7)
             sender.setTranslation(CGPointMake(0,0), inView: view)
             if didTakePicture{
                 self.imageView.center = self.circleView.center
@@ -224,13 +227,16 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     func updateScheduleText(){
         
-        if circleView.frame.origin.y < 260 {
+        if circleView.frame.origin.y < 81 {
+            scheduleText.text = "Someday"
+        }
+        else if circleView.frame.origin.y < 160 {
             scheduleText.text = "In a year"
         }
-        else if circleView.frame.origin.y < 300 {
+        else if circleView.frame.origin.y < 220 {
             scheduleText.text = "Next Month"
         }
-        else if circleView.frame.origin.y < 340 {
+        else if circleView.frame.origin.y < 300 {
             scheduleText.text = "Next Week"
         }
         else if circleView.frame.origin.y < 380 {
@@ -280,6 +286,10 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         if (calendarPickerLabel? != nil){
             calendarPickerLabel.removeFromSuperview()
         }
+        
+        if (backgroundImageView? != nil){
+            backgroundImageView.removeFromSuperview()
+        }
 
         scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
         scheduleText.alpha = 1
@@ -296,6 +306,11 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         circleView.alpha = 1
         originalCirclePoint = circleView.center
         view.addSubview(circleView)
+        
+        backgroundImageView = UIImageView(frame: CGRectMake(0,667-1836,375,1836))
+        backgroundImageView.image = UIImage(named: "backgroundImage")
+        backgroundImageView.alpha = 0
+        self.view.addSubview(backgroundImageView)
         
     }
     
@@ -385,6 +400,11 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
        // self.imageView.alpha = 1
        // self.circleView.alpha = 0
         //    circleView.alpha = 0.0
+        
+
+        backgroundImageView.alpha = 1
+        view.bringSubviewToFront(scheduleText)
+        println(view.frame)
         
         
         UIView.animateWithDuration(0.2, animations: { () -> Void in
