@@ -68,16 +68,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "l8r_hell/InboxViewController.swift"
-            timestampString = "444088383.154047"
+            filePath = "l8r_hell/CameraViewController.swift"
+            timestampString = "444601529.080596"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
-            landmarkName = "viewDidLoad()"
+            startingLineNumber = "221"
+            endingLineNumber = "221"
+            landmarkName = "addGestureRecognizerToOverlayView()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

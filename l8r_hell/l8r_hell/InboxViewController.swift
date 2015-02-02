@@ -31,12 +31,30 @@ class InboxViewController: UIViewController {
         
         
         let theImagePath = NSUserDefaults.standardUserDefaults().objectForKey("imagePath") as NSString
+        theImageView.frame = CGRectMake(0,83,320,568)
+        let imageToShow = UIImage(contentsOfFile: theImagePath)
+        let stretchRatio = 1.333333
+        println(stretchRatio)
         
-        theImageView.image = UIImage(contentsOfFile: theImagePath)
+      //  theImageView.image = imageToShow
+
+        theImageView.image = imageWithImage(imageToShow!, scaledToSize: CGSizeMake(theImageView.frame.size.width,theImageView.frame.size.height))
         
+//        var newFrame = theImageView.frame
+//        newFrame.origin.y = view.frame.height-140
+//        theImageView.frame = newFrame
+        
+
         view.addSubview(theImageView)
+        view.addSubview(cameraButton)
+        view.bringSubviewToFront(cameraButton)
        
-        
-        
+    }
+    func imageWithImage(image:UIImage, scaledToSize newSize:CGSize) -> UIImage{
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
+        image.drawInRect(CGRectMake(0, 0, newSize.width, newSize.height))
+        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
     }
 }

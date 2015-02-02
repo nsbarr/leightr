@@ -29,7 +29,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var animator:UIDynamicAnimator!
     
     var didTakePicture = false
-    var isSavingPictures = false
+    var isSavingPictures = true
     
     var calendarPickerLabel:UILabel!
     var calendarPicker:UIView!
@@ -43,6 +43,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     var tempImage:UIImage!
 
+    var pointInView:CGPoint!
 
 
     
@@ -60,6 +61,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.resetCameraViewAndMenu()
         
         self.setUpCalendar()
+        self.addGestureRecognizerToOverlayView()
         
         setupNotificationSettings()
         
@@ -215,6 +217,38 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
     }
     
+    func addGestureRecognizerToOverlayView(){
+        let swipeUp = UITapGestureRecognizer(target: self, action: Selector("takePictureTwo:"))
+        
+        var overlayView = UIView(frame:self.view.frame)
+        overlayView.alpha = 0.1
+        overlayView.backgroundColor = UIColor.clearColor()
+        overlayView.userInteractionEnabled = true
+        overlayView.addGestureRecognizer(swipeUp)
+        imagePickerController.cameraOverlayView = overlayView
+        
+    }
+    
+
+    
+    func animateImageViewWithCenter(center: CGPoint){
+        //  imagePickerController.view.layer.cornerRadius = 30
+        //   self.imagePickerController.view.clipsToBounds = true
+        
+        UIView.animateWithDuration(1, animations: { () -> Void in
+            self.imageView.frame.size = CGSizeMake(40, 40)
+            self.imageView.center = center
+            
+            }, completion:nil)
+        
+        println(self.view)
+        // println(self.imagePickerController)
+        // println(imagePickerController.view)
+        //  println(imagePickerController.view.subviews)
+        
+    }
+
+    
     func dismissCalendar(sender: UIButton){
         println("scheduling")
         if (snap != nil) {
@@ -295,20 +329,27 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             libraryButton.removeFromSuperview()
         }
         
-        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.width)
+        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height+20)
         imagePickerController.view.frame = imagePickerControllerFrame;
+
+                let translate = CGAffineTransformMakeTranslation(0, 83.0)
+                self.imagePickerController.cameraViewTransform = translate
+        
+                let scale = CGAffineTransformScale(translate, 1.333333, 1.333333)
+              //  let scale = CGAffineTransformMakeScale(1.3, 1.3)
+                self.imagePickerController.cameraViewTransform = scale
         imageView = imagePickerController.view
         imageView.layer.cornerRadius = 0
         self.view.addSubview(imageView)
         
-        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-80, 50, 50))
+        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-60, 30, 30))
         inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
         let inboxButtonImage = UIImage(named: "inboxButtonImage")
         inboxButton.setImage(inboxButtonImage, forState: .Normal)
         inboxButton.alpha = 1
         view.addSubview(inboxButton)
         
-        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-80, 50, 50))
+        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-60, 30, 30))
         inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
         let libraryButtomImage = UIImage(named: "libraryButtonImage")
         libraryButton.setImage(libraryButtomImage, forState: .Normal)
@@ -321,7 +362,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         scheduleText.textColor = UIColor.blackColor()
         view.addSubview(scheduleText)
         
-        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-240, width: circleRadius*2, height: circleRadius*2))
+        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-210, width: circleRadius*2, height: circleRadius*2))
         circleView.clipsToBounds = true
         circleView.image = UIImage(named: "snapbuttonvector")
         circleView.layer.cornerRadius = circleRadius
@@ -350,7 +391,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         if (sourceType == UIImagePickerControllerSourceType.Camera){
             
             imagePickerController.showsCameraControls = false
-            
+            imagePickerController.cameraFlashMode = UIImagePickerControllerCameraFlashMode.Off
             
             
             println(imagePickerController.view)
@@ -410,6 +451,47 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         libraryButton.alpha = 0
         inboxButton.alpha = 0
     }
+    
+    func takePictureTwo(sender: UITapGestureRecognizer){
+        self.imagePickerController.takePicture()
+        
+
+        pointInView = sender.locationInView(sender.view)
+        
+        
+        self.imageView.layer.cornerRadius = self.circleRadius
+        self.imageView.clipsToBounds = true
+        self.view.bringSubviewToFront(self.imageView)
+        self.view.sendSubviewToBack(self.circleView)
+        println(self.view.subviews)
+        // self.imageView.opaque = true
+        // self.imageView.alpha = 1
+        // self.circleView.alpha = 0
+        //    circleView.alpha = 0.0
+        
+        
+        backgroundImageView.alpha = 1
+        view.bringSubviewToFront(scheduleText)
+        println(view.frame)
+        
+        
+        UIView.animateWithDuration(0.2, animations: { () -> Void in
+            
+            self.imageView.frame.size = self.circleView.frame.size
+           self.imageView.center = self.circleView.center
+        //    self.imageView.center = self.pointInView
+            
+            }, completion:nil)
+        didTakePicture = true
+
+        
+        view.addSubview(calendarPicker)
+        calendarPicker.addSubview(calendarPickerLabel)
+        
+        libraryButton.alpha = 0
+        inboxButton.alpha = 0
+    }
+
     
     func savePicture(){
         let imageData = UIImageJPEGRepresentation(tempImage, 1.0)
