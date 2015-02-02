@@ -308,7 +308,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         view.addSubview(circleView)
         
         backgroundImageView = UIImageView(frame: CGRectMake(0,667-1836,375,1836))
-        backgroundImageView.image = UIImage(named: "backgroundImage")
+        backgroundImageView.image = UIImage(named: "whiteBackgroundImage")
         backgroundImageView.alpha = 0
         self.view.addSubview(backgroundImageView)
         
@@ -500,7 +500,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
         var currentTime = NSDate()
         var timeComponent = NSDateComponents()
-        timeComponent.second = 20
+        timeComponent.second = 10
         var theCalendar = NSCalendar.currentCalendar()
         var scheduledDate = theCalendar.dateByAddingComponents(timeComponent, toDate: currentTime, options: NSCalendarOptions(0))
         
