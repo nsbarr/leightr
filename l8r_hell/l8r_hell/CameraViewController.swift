@@ -38,6 +38,10 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var scheduledDate: NSDate!
     
     var backgroundImageView: UIImageView!
+    
+    var timeComponent = NSDateComponents()
+    
+    var tempImage:UIImage!
 
 
 
@@ -51,10 +55,10 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         println(self.parentViewController)
         super.viewDidLoad()
         animator = UIDynamicAnimator(referenceView: view)
-        self.addMenuButtons()
-        self.addCircleViewAndScheduleText()
-        self.showCameraView()
+        
         self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
+        self.resetCameraViewAndMenu()
+        
         self.setUpCalendar()
         
         setupNotificationSettings()
@@ -105,11 +109,14 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             if didTakePicture{
                 self.imageView.center = self.circleView.center
             }
+            else {
+                self.takePicture()
+            }
             self.updateScheduleText()
             if ((circleView.frame.origin.y > 460 || circleView.frame.origin.y < 380) && !didTakePicture){
                 
                 println("takingPicture")
-                self.takePicture()
+           //     self.takePicture()
             }
             
             if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame)) {
@@ -136,7 +143,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 animator.addBehavior(snap)
                 
                 okButton = UIButton(frame: CGRectMake(calendarPicker.frame.width-64,calendarPicker.frame.height-44, 44, 44))
-                okButton.addTarget(self, action: Selector("schedulePhoto:"), forControlEvents:UIControlEvents.TouchUpInside)
+                okButton.addTarget(self, action: Selector("dismissCalendar:"), forControlEvents:UIControlEvents.TouchUpInside)
                 okButton.backgroundColor = UIColor.blackColor()
                 okButton.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 18.0)
                 okButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
@@ -151,7 +158,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(view.frame.width-44, scheduleText.frame.origin.y+circleView.frame.height/2))
                 snap.damping = 0.8
                 animator.addBehavior(snap)
-                self.confirmSchedule()
+                self.animateScheduleText()
                 
             }
                 
@@ -208,20 +215,17 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
     }
     
-    func schedulePhoto(sender: UIButton){
+    func dismissCalendar(sender: UIButton){
         println("scheduling")
         if (snap != nil) {
             animator.removeBehavior(snap)
         }
         
-
         self.shrinkCalendarPicker()
         
-
+        self.schedulePhoto()
         
-        didTakePicture = false
-        self.addCircleViewAndScheduleText()
-        self.showCameraView()
+        self.resetCameraViewAndMenu()
         
     }
     
@@ -251,27 +255,19 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
     }
 
+
     
-    
-    func addMenuButtons(){
-        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-80, 50, 50))
-        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
-        let inboxButtonImage = UIImage(named: "inboxButtonImage")
-        inboxButton.setImage(inboxButtonImage, forState: .Normal)
-        view.addSubview(inboxButton)
+    func resetCameraViewAndMenu(){
         
-        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-80, 50, 50))
-        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
-        let libraryButtomImage = UIImage(named: "libraryButtonImage")
-        libraryButton.setImage(libraryButtomImage, forState: .Normal)
-        view.addSubview(libraryButton)
         
-    }
-    
-    func addCircleViewAndScheduleText(){
+        self.didTakePicture = false
         
         if (circleView? != nil){
             circleView.removeFromSuperview()
+        }
+        
+        if (imageView? != nil){
+            imageView.removeFromSuperview()
         }
         
         if (scheduleText? != nil){
@@ -290,7 +286,35 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         if (backgroundImageView? != nil){
             backgroundImageView.removeFromSuperview()
         }
-
+        
+        if (inboxButton? != nil){
+            inboxButton.removeFromSuperview()
+        }
+        
+        if (libraryButton? != nil) {
+            libraryButton.removeFromSuperview()
+        }
+        
+        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.width)
+        imagePickerController.view.frame = imagePickerControllerFrame;
+        imageView = imagePickerController.view
+        imageView.layer.cornerRadius = 0
+        self.view.addSubview(imageView)
+        
+        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-80, 50, 50))
+        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let inboxButtonImage = UIImage(named: "inboxButtonImage")
+        inboxButton.setImage(inboxButtonImage, forState: .Normal)
+        inboxButton.alpha = 1
+        view.addSubview(inboxButton)
+        
+        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-80, 50, 50))
+        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let libraryButtomImage = UIImage(named: "libraryButtonImage")
+        libraryButton.setImage(libraryButtomImage, forState: .Normal)
+        libraryButton.alpha = 1
+        view.addSubview(libraryButton)
+        
         scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
         scheduleText.alpha = 1
         scheduleText.font = UIFont(name: "ArialRoundedMTBold", size: 40.0)
@@ -311,24 +335,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         backgroundImageView.image = UIImage(named: "whiteBackgroundImage")
         backgroundImageView.alpha = 0
         self.view.addSubview(backgroundImageView)
-        
-    }
-    
-    func showCameraView(){
-        
-       // self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
 
         
-        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.width)
-        imagePickerController.view.frame = imagePickerControllerFrame;
-        imageView = imagePickerController.view
-        imageView.layer.cornerRadius = 0
-
-        
-        self.view.addSubview(imageView)
-        
-        libraryButton.alpha = 1
-        inboxButton.alpha = 1
 
         
     }
@@ -349,9 +357,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             
             println(imagePickerController.view.superview)
             
-
-            
-            
             
         }
         self.presentViewController(self.imagePickerController, animated: true, completion: nil)
@@ -361,26 +366,9 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
         //   let image = info(valueForKeyPath(UIImagePickerControllerOriginalImage))
-        let tempImage = info[UIImagePickerControllerOriginalImage] as UIImage
+        tempImage = info[UIImagePickerControllerOriginalImage] as UIImage
         
 
-        
-        let imageData = UIImageJPEGRepresentation(tempImage, 1.0)
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString
-        let imagePath = paths.stringByAppendingPathComponent("cached.png")
-        
-        println(imagePath)
-        if !imageData.writeToFile(imagePath, atomically: false){
-            println("not saved")
-        }
-        else {
-            println("saved")
-            NSUserDefaults.standardUserDefaults().setObject(imagePath, forKey: "imagePath")
-        }
-        
-        if isSavingPictures {
-            UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
-        }
         
         
         circleView.image = tempImage
@@ -423,31 +411,86 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         inboxButton.alpha = 0
     }
     
-    func confirmSchedule(){
+    func savePicture(){
+        let imageData = UIImageJPEGRepresentation(tempImage, 1.0)
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString
+        let imagePath = paths.stringByAppendingPathComponent("cached.png")
+        
+        println(imagePath)
+        if !imageData.writeToFile(imagePath, atomically: false){
+            println("not saved")
+        }
+        else {
+            println("saved")
+            NSUserDefaults.standardUserDefaults().setObject(imagePath, forKey: "imagePath")
+        }
+        
+        if isSavingPictures {
+            UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
+        }
+    }
+    
+    func setFireDate(){
+        
+        timeComponent = NSDateComponents()
+        
+        if scheduleText.text == "Someday" {
+            timeComponent.second = 10
+        }
+        else if scheduleText.text == "In a year" {
+            timeComponent.year = 1
+        }
+        else if scheduleText.text == "Next Month" {
+            timeComponent.month = 1
+        }
+        else if scheduleText.text == "Next Week" {
+            timeComponent.day = 7
+        }
+        else if scheduleText.text == "Tomorrow" {
+            timeComponent.day = 1
+        }
+        else {
+            println("no schedule text?")
+        }
+        println(timeComponent)
+        
+        
+    }
+    
+    func schedulePhoto(){
+        
+        self.savePicture()
+        self.setFireDate()
+        self.scheduleLocalNotification()
+        
+        
+    }
+    
+    func animateScheduleText(){
+        
         var scheduleTextNewFrame = self.scheduleText.frame
         scheduleTextNewFrame.origin.y = -scheduleTextNewFrame.size.height
         
         
         UIView.animateWithDuration(0.6, delay: 0.8, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
             
-//            
-//                        if (self.snap != nil) {
-//                            self.animator.removeBehavior(self.snap)
-//                        }
+            //
+            //                        if (self.snap != nil) {
+            //                            self.animator.removeBehavior(self.snap)
+            //                        }
             
             self.circleView.alpha = 0
             self.scheduleText.frame = scheduleTextNewFrame
             self.scheduleText.alpha = 0.3
             
             }, completion: {(value: Bool) in
-
-                self.showCameraView()
-                self.addCircleViewAndScheduleText()
-                self.didTakePicture = false
+                
+                self.schedulePhoto()
+                self.resetCameraViewAndMenu()
+                
                 
         })
         
-        self.scheduleLocalNotification()
         
     }
     
@@ -499,8 +542,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     func scheduleLocalNotification() {
         
         var currentTime = NSDate()
-        var timeComponent = NSDateComponents()
-        timeComponent.second = 10
         var theCalendar = NSCalendar.currentCalendar()
         var scheduledDate = theCalendar.dateByAddingComponents(timeComponent, toDate: currentTime, options: NSCalendarOptions(0))
         
