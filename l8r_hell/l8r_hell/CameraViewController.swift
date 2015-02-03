@@ -629,6 +629,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
         var localNotification = UILocalNotification()
         localNotification.fireDate = scheduledDate
+        localNotification.repeatInterval = NSCalendarUnit.YearCalendarUnit //this is just an evil way to not expire the notification
         localNotification.alertBody = "Your l8r is now"
         localNotification.alertAction = "View"
         localNotification.category = "shoppingListReminderCategory"
