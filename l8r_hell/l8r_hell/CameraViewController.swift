@@ -436,7 +436,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         println(view.frame)
         
         
-        UIView.animateWithDuration(0.2, animations: { () -> Void in
+        UIView.animateWithDuration(0.1, animations: { () -> Void in
             
             self.imageView.frame.size = self.circleView.frame.size
             self.imageView.center = self.circleView.center

@@ -20,6 +20,9 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
     var calButton: UIButton!
     var scheduleButton: UIButton!
     
+    var tappedPoint:CGPoint!
+    var tappedView:UIView!
+    
     
     let circleViewFrameSize:CGSize = CGSizeMake(80, 80)
     let actionButtonWidth:CGFloat = 60
@@ -53,6 +56,9 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(cameraButton)
         view.bringSubviewToFront(cameraButton)
         println(imageView.superview)
+        
+        let panGesture = UIPanGestureRecognizer(target: self, action: Selector("inboxImageWasPanned:"))
+        view.addGestureRecognizer(panGesture)
        
     }
     
@@ -69,6 +75,7 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
      //   view.addSubview(imageView)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: Selector("inboxImageWasTapped:"))
+        
         imageView.userInteractionEnabled = true
         imageView.addGestureRecognizer(tapGesture)
 
@@ -88,6 +95,33 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
             //    self.imageView.center = self.pointInView
             
             }, completion:nil)
+    }
+    
+    func inboxImageWasPanned(sender: UIPanGestureRecognizer){
+        
+        sender.delegate = self
+        
+        if (sender.state == .Began){
+        
+            println("pan began")
+            tappedPoint = sender.locationInView(view)
+            tappedView = view.hitTest(tappedPoint, withEvent: nil)
+        
+        }
+        
+        if (tappedView == imageView && sender.state == .Changed) {
+            
+            println("changed")
+            let translation = sender.translationInView(view)
+            imageView.center = CGPointMake(imageView.center.x, imageView.center.y + translation.y)
+            sender.setTranslation(CGPointMake(0,0), inView: view)
+
+        }
+        
+        if (tappedView == imageView && sender.state == .Ended) {
+            println("ended")
+        }
+        
     }
         
 
@@ -120,6 +154,7 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
         calButton.setImage(calButtonImage, forState: .Normal)
         calButton.alpha = 1
         view.addSubview(calButton)
+        view.sendSubviewToBack(calButton)
         
         scheduleButton = UIButton(frame: CGRectMake(self.view.frame.width/2,self.view.frame.height-100, actionButtonWidth,actionButtonWidth))
         scheduleButton.center.x = self.view.center.x
@@ -152,6 +187,7 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
             }, completion: {(value: Bool) in
                 println("complete")
                 
+                
                 //add confirmButton
                 
 
@@ -170,10 +206,11 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func disappearImage(){
+        self.scheduleButton.hidden = true
         var imageViewNewFrame = imageView.frame
-        imageViewNewFrame.origin.y = imageView.frame.origin.y-800
+        imageViewNewFrame.origin.y = imageView.frame.origin.y-300
         
-        UIView.animateWithDuration(0.6, delay: 0.2, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+        UIView.animateWithDuration(0.7, delay: 0.2, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
             
             self.imageView.alpha = 0.2
             self.imageView.frame = imageViewNewFrame
@@ -182,13 +219,31 @@ class InboxViewController: UIViewController, UIGestureRecognizerDelegate {
                 println("complete")
                 
                 //add confirmButton
-
+                
+                self.scheduleLocalNotification()
                 self.setUpInbox()
                 self.addActionButtons()
                 
         })
 
     }
+    
+    func scheduleLocalNotification() {
+        
+        var currentTime = NSDate()
+        var theCalendar = NSCalendar.currentCalendar()
+        var scheduledDate = datePicker.date
+        var localNotification = UILocalNotification()
+        
+        localNotification.fireDate = scheduledDate
+        localNotification.repeatInterval = NSCalendarUnit.YearCalendarUnit //this is just an evil way to not expire the notification
+        localNotification.alertBody = "Your l8r is now"
+        localNotification.alertAction = "View"
+        localNotification.category = "shoppingListReminderCategory"
+        UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
+        
+    }
+
     
     func imageWithImage(image:UIImage, scaledToSize newSize:CGSize) -> UIImage{
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
