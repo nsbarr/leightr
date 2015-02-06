@@ -72,11 +72,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "l8r_hell/CameraViewController.swift"
-            timestampString = "444601529.080596"
+            timestampString = "444849590.707481"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
+            startingLineNumber = "364"
+            endingLineNumber = "364"
             landmarkName = "addGestureRecognizerToOverlayView()"
             landmarkType = "5">
          </BreakpointContent>

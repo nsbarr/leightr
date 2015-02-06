@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="xeq-us-tLL">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Page View Controller-->
@@ -31,15 +30,6 @@
                                     <constraint firstAttribute="width" constant="460" id="Xtr-2w-WA3"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RHs-kG-Wdw">
-                                <rect key="frame" x="16" y="570" width="111" height="30"/>
-                                <state key="normal" title="Back to Camera">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="cameraButtonTapped:" destination="av9-nU-x5p" eventType="touchUpInside" id="E6F-38-PHf"/>
-                                </connections>
-                            </button>
                             <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="0PB-lX-Uzy">
                                 <rect key="frame" x="151" y="219" width="298" height="162"/>
                                 <constraints>
@@ -49,20 +39,27 @@
                                     <!--2015-02-03 22:24:09 +0000-->
                                 </date>
                             </datePicker>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H78-ge-wNV">
+                                <rect key="frame" x="269" y="562" width="63" height="30"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="cameraButtonTapped:" destination="av9-nU-x5p" eventType="touchUpInside" id="4oT-hD-2Rg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="0PB-lX-Uzy" firstAttribute="centerX" secondItem="1o9-WB-W13" secondAttribute="centerX" id="9Iq-ag-P68"/>
                             <constraint firstItem="HbV-Hi-fo2" firstAttribute="top" secondItem="FuT-NO-scR" secondAttribute="bottom" constant="-10" id="RSP-OM-y0d"/>
                             <constraint firstItem="FuT-NO-scR" firstAttribute="leading" secondItem="1o9-WB-W13" secondAttribute="leading" id="RWl-TB-X0B"/>
-                            <constraint firstItem="RHs-kG-Wdw" firstAttribute="bottom" secondItem="HbV-Hi-fo2" secondAttribute="top" id="VUJ-6E-ehD"/>
                             <constraint firstItem="0PB-lX-Uzy" firstAttribute="top" secondItem="Qd6-Cx-njO" secondAttribute="bottom" constant="199" id="WJ8-Em-rcd"/>
-                            <constraint firstItem="RHs-kG-Wdw" firstAttribute="leading" secondItem="1o9-WB-W13" secondAttribute="leadingMargin" id="XJv-ov-xIR"/>
                             <constraint firstItem="FuT-NO-scR" firstAttribute="top" secondItem="1o9-WB-W13" secondAttribute="top" id="qW8-Ng-92D"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="cameraButton" destination="RHs-kG-Wdw" id="6iZ-BJ-39g"/>
+                        <outlet property="cameraButton" destination="H78-ge-wNV" id="NFQ-IW-MxX"/>
                         <outlet property="datePicker" destination="0PB-lX-Uzy" id="rfK-RC-IHw"/>
                         <outlet property="imageView" destination="FuT-NO-scR" id="GTO-Fl-wm8"/>
                     </connections>
@@ -82,13 +79,29 @@
                     <view key="view" contentMode="scaleToFill" id="6yJ-W4-dlc">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="Xqf-tT-Ju7">
+                                <rect key="frame" x="151" y="219" width="298" height="162"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="298" id="suv-2p-aqd"/>
+                                </constraints>
+                                <date key="date" timeIntervalSinceReferenceDate="444695049.70360601">
+                                    <!--2015-02-03 22:24:09 +0000-->
+                                </date>
+                            </datePicker>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Xqf-tT-Ju7" firstAttribute="centerY" secondItem="6yJ-W4-dlc" secondAttribute="centerY" id="byB-a3-xU0"/>
+                            <constraint firstItem="Xqf-tT-Ju7" firstAttribute="centerX" secondItem="6yJ-W4-dlc" secondAttribute="centerX" id="ras-rh-MXO"/>
+                        </constraints>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="rJ5-hx-xke" appends="YES" id="4fF-qi-SpK"/>
                             <outletCollection property="gestureRecognizers" destination="XmI-Pg-fPh" appends="YES" id="OkN-xe-IKR"/>
                         </connections>
                     </view>
                     <connections>
+                        <outlet property="datePicker" destination="Xqf-tT-Ju7" id="uxp-EL-0qD"/>
                         <outlet property="handlePan" destination="XmI-Pg-fPh" id="UIf-Xr-1ig"/>
                         <outlet property="handleTap" destination="rJ5-hx-xke" id="sRX-P0-p6W"/>
                     </connections>

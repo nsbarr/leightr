@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        println(UIApplication.sharedApplication().scheduledLocalNotifications)
+     //   println(UIApplication.sharedApplication().scheduledLocalNotifications)
     }
 
     func applicationWillTerminate(application: UIApplication) {
@@ -48,17 +48,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         println(notification.alertBody)
     }
     
+
+    
     func application(application: UIApplication, handleActionWithIdentifier identifier: String?, forLocalNotification notification: UILocalNotification, completionHandler: () -> Void) {
         
-        if identifier == "editList" {
-            NSNotificationCenter.defaultCenter().postNotificationName("modifyListNotification", object: nil)
-        }
-        else if identifier == "trashAction" {
-            NSNotificationCenter.defaultCenter().postNotificationName("deleteListNotification", object: nil)
-        }
-        else {
-            println("didn't recognize identifier")
-        }
+       NSNotificationCenter.defaultCenter().postNotificationName("loadInboxNotification", object: nil)
+        println("loading it up")
+            let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let ivc = mainStoryboard.instantiateViewControllerWithIdentifier("InboxViewController") as InboxViewController
+            
+            self.window?.rootViewController?.presentViewController(ivc, animated: false, completion: nil)
+        
+        
+            //   ivc.modalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+            // pvc.setViewControllers([ivc], direction: UIPageViewControllerNavigationDirection.Reverse, animated: true, completion: nil)
+         //   self.presentViewController(ivc, animated: true, completion: nil)
+         //   UIApplication.sharedApplication().keyWindow.ivc
+
         
         completionHandler()
     }

@@ -18,10 +18,15 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     let circleRadius:CGFloat = 40
     var originalCirclePoint:CGPoint!
     
+    
     let imagePickerController = UIImagePickerController()
     var imageView: UIView!
     var tappedPoint:CGPoint!
     var tappedView:UIView!
+    
+    var cyaButton: UIButton!
+    var calButton: UIButton!
+    var scheduleButton: UIButton!
     
     var scheduleText:UILabel!
     
@@ -31,9 +36,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var didTakePicture = false
     var isSavingPictures = true
     
-    var calendarPickerLabel:UILabel!
-    var calendarPicker:UIView!
-    var okButton: UIButton!
     
     var scheduledDate: NSDate!
     
@@ -44,23 +46,29 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var tempImage:UIImage!
 
     var pointInView:CGPoint!
-
-
     
+    let actionButtonWidth:CGFloat = 60
+
+
+    @IBOutlet var datePicker: UIDatePicker!
+
     @IBOutlet var handlePan: UIPanGestureRecognizer!
     @IBOutlet var handleTap: UITapGestureRecognizer!
     
     
     
     override func viewDidLoad() {
-        println(self.parentViewController)
         super.viewDidLoad()
+        
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadInboxVC", name: "loadInboxNotification", object: nil)
+
         animator = UIDynamicAnimator(referenceView: view)
         
         self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
-        self.resetCameraViewAndMenu()
+        self.setUpCameraView()
         
-        self.setUpCalendar()
+        self.addActionButtons()
         self.addGestureRecognizerToOverlayView()
         
         setupNotificationSettings()
@@ -69,6 +77,11 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         println(self.view.gestureRecognizers)
         println(self.parentViewController?.view.gestureRecognizers)
         
+        
+        datePicker.hidden = true
+        datePicker.frame = self.view.frame
+        datePicker.center = self.view.center
+
         
 
 
@@ -115,19 +128,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 self.takePicture()
             }
             self.updateScheduleText()
-            if ((circleView.frame.origin.y > 460 || circleView.frame.origin.y < 380) && !didTakePicture){
-                
-                println("takingPicture")
-           //     self.takePicture()
-            }
-            
-            if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame)) {
-                println("overlap")
-                self.growCalendarPicker()
-            }
-            else {
-                self.shrinkCalendarPicker()
-            }
             
         }
         
@@ -139,22 +139,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 animator.removeBehavior(snap)
             }
             
-            if (CGRectIntersectsRect(circleView.frame, calendarPicker.frame) == true){
-                snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(0 + circleView.frame.width/2, view.frame.height - circleView.frame.height/2))
-                snap.damping = 0.8
-                animator.addBehavior(snap)
-                
-                okButton = UIButton(frame: CGRectMake(calendarPicker.frame.width-64,calendarPicker.frame.height-44, 44, 44))
-                okButton.addTarget(self, action: Selector("dismissCalendar:"), forControlEvents:UIControlEvents.TouchUpInside)
-                okButton.backgroundColor = UIColor.blackColor()
-                okButton.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 18.0)
-                okButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-                okButton.setTitle("Ok", forState: UIControlState.Normal)
-                calendarPicker.addSubview(okButton)
-            }
-                
             
-            else if (circleView.frame.origin.y < 370) { //schedule
+            if (circleView.frame.origin.y < 370) { //schedule
                 println("snapping up")
                 
                 snap = UISnapBehavior(item: circleView, snapToPoint: CGPointMake(view.frame.width-44, scheduleText.frame.origin.y+circleView.frame.height/2))
@@ -174,48 +160,205 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         
     }
     
-    func setUpCalendar(){
-        calendarPicker = UIView(frame: CGRect(x:0, y:view.frame.height-60, width:self.view.frame.width, height:60))
-        calendarPicker.backgroundColor = UIColor.blackColor()
-        calendarPicker.alpha = 1.0
+    func setUpCameraView(){
         
-        calendarPickerLabel = UILabel(frame: CGRect(x:self.view.frame.width/2, y:12, width:0, height:0))
-        calendarPickerLabel.font = UIFont(name: "ArialRoundedMTBold", size: 18.0)
-        calendarPickerLabel.text = "Calendar"
-        calendarPickerLabel.textColor = UIColor.whiteColor()
-        println(calendarPickerLabel.center)
-        calendarPickerLabel.sizeToFit()
-        calendarPickerLabel.center.x = calendarPicker.center.x
+        
+        self.didTakePicture = false
+        
+        if (circleView? != nil){
+            circleView.removeFromSuperview()
+        }
+        
+        if (imageView? != nil){
+            imageView.removeFromSuperview()
+        }
+        
+        if (backgroundImageView? != nil){
+            backgroundImageView.removeFromSuperview()
+        }
+        
+        if (inboxButton? != nil){
+            inboxButton.removeFromSuperview()
+        }
+        
+        if (libraryButton? != nil) {
+            libraryButton.removeFromSuperview()
+        }
+        
+        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height+20)
+        imagePickerController.view.frame = imagePickerControllerFrame;
+        
+        let translate = CGAffineTransformMakeTranslation(0, 83.0)
+        self.imagePickerController.cameraViewTransform = translate
+        
+        let scale = CGAffineTransformScale(translate, 1.333333, 1.333333)
+        self.imagePickerController.cameraViewTransform = scale
+        imageView = imagePickerController.view
+        imageView.layer.cornerRadius = 0
+        imageView.alpha = 1
+        self.view.addSubview(imageView)
+        
+        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-60, 30, 30))
+        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let inboxButtonImage = UIImage(named: "inboxButtonImage")
+        inboxButton.setImage(inboxButtonImage, forState: .Normal)
+        inboxButton.alpha = 1
+        view.addSubview(inboxButton)
+        
+        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-60, 30, 30))
+        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let libraryButtomImage = UIImage(named: "libraryButtonImage")
+        libraryButton.setImage(libraryButtomImage, forState: .Normal)
+        libraryButton.alpha = 1
+        view.addSubview(libraryButton)
+        
+            
+        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-210, width: circleRadius*2, height: circleRadius*2))
+        circleView.clipsToBounds = true
+        circleView.image = UIImage(named: "snapbuttonvector")
+        circleView.layer.cornerRadius = circleRadius
+        circleView.userInteractionEnabled = true
+        circleView.layer.zPosition = 10
+        circleView.alpha = 1
+        originalCirclePoint = circleView.center
+        view.addSubview(circleView)
+        
+        backgroundImageView = UIImageView(frame: CGRectMake(0,667-1836,375,1836))
+        backgroundImageView.image = UIImage(named: "whiteBackgroundImage")
+        backgroundImageView.alpha = 0
+        self.view.addSubview(backgroundImageView)
+        
     }
     
-    func shrinkCalendarPicker(){
-        
-        var newFrame = calendarPicker.frame
-        newFrame.origin.y = view.frame.height-60
-        calendarPicker.frame = newFrame
-        
-        
-        calendarPickerLabel.text = "Calendar"
-        calendarPickerLabel.sizeToFit()
-        calendarPickerLabel.textAlignment = NSTextAlignment.Center
-        calendarPickerLabel.center.x = calendarPicker.center.x
-        
-    }
     
-    
-    func growCalendarPicker(){
-        println("growing")
-        var newFrame = CGRect(x:0, y:view.frame.height-200, width:self.view.frame.width, height:200)
-        calendarPicker.frame = newFrame
+    func addActionButtons(){
         
-        calendarPickerLabel.text = "Release to Pick Date"
-        calendarPickerLabel.sizeToFit()
-        calendarPickerLabel.textAlignment = NSTextAlignment.Center
-        calendarPickerLabel.center.x = calendarPicker.center.x
+        if cyaButton != nil {
+            cyaButton.removeFromSuperview()
+        }
         
+        if calButton != nil {
+            calButton.removeFromSuperview()
+        }
+        
+        if scheduleButton != nil {
+            scheduleButton.removeFromSuperview()
+        }
+        
+        if scheduleText != nil {
+            scheduleText.removeFromSuperview()
+        }
+        
+        scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
+        scheduleText.alpha = 1
+        scheduleText.font = UIFont(name: "ArialRoundedMTBold", size: 40.0)
+        scheduleText.textColor = UIColor.blackColor()
+        scheduleText.textAlignment = .Center
+        // scheduleText.center.x = view.center.x
+        scheduleText.sizeToFit()
         scheduleText.text = ""
+        view.addSubview(scheduleText)
+        
+        cyaButton = UIButton(frame: CGRectMake(20,self.view.frame.height-60, actionButtonWidth, actionButtonWidth))
+        cyaButton.addTarget(self, action: Selector("trashImage:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let cyaButtonImage = UIImage(named: "cyaButtonImage")
+        //   cyaButton.setImage(cyaButtonImage, forState: .Normal)
+        cyaButton.setTitle("CYA", forState: UIControlState.Normal)
+        cyaButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        cyaButton.alpha = 1
+        view.addSubview(cyaButton)
+        view.sendSubviewToBack(cyaButton)
+        
+        calButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-60, actionButtonWidth, actionButtonWidth))
+        calButton.addTarget(self, action: Selector("openCalendar:"), forControlEvents:UIControlEvents.TouchUpInside)
+        let calButtonImage = UIImage(named: "calButtonImage")
+        //   calButton.setImage(calButtonImage, forState: .Normal)
+        calButton.setTitle("CAL", forState: UIControlState.Normal)
+        calButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        calButton.alpha = 1
+        view.addSubview(calButton)
+        view.sendSubviewToBack(calButton)
+        
+        scheduleButton = UIButton(frame: CGRectMake(self.view.frame.width/2,self.view.frame.height-100, actionButtonWidth,actionButtonWidth))
+        scheduleButton.center.x = self.view.center.x
+        scheduleButton.addTarget(self, action: Selector("scheduleImage:"), forControlEvents: UIControlEvents.TouchUpInside)
+        scheduleButton.setTitle("L8R", forState: UIControlState.Normal)
+        scheduleButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+        scheduleButton.hidden = true
+        view.addSubview(scheduleButton)
+        
+        view.sendSubviewToBack(backgroundImageView)
+
+    }
+    
+    
+    func openCalendar(sender: UIButton){
+        
+        //animate up imageView
+        
+        if (snap != nil) {
+            animator.removeBehavior(snap)
+        }
+        imageView.alpha = 0
+        
+        var imageViewNewFrame = imageView.frame
+        imageViewNewFrame.origin.y = imageView.frame.origin.y-300
+        imageView.userInteractionEnabled = false
+        calButton.hidden = true
+        cyaButton.hidden = true
+        self.scheduleButton.hidden = false
+        
+        UIView.animateWithDuration(0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            
+            self.circleView.frame = imageViewNewFrame
+            self.datePicker.hidden = false
+            
+            }, completion: {(value: Bool) in
+                println("complete")
+                
+                
+                //add confirmButton
+                
+                
+                
+        })
         
     }
+    
+    func scheduleImage(sender: UIButton){
+        datePicker.hidden = true
+        self.disappearImage()
+        //show next image in the inbox, if there is one.
+        println("scheduled")
+    }
+    
+    func disappearImage(){
+        self.scheduleButton.hidden = true
+        var imageViewNewFrame = circleView.frame
+        imageViewNewFrame.origin.y = circleView.frame.origin.y-300
+        
+        UIView.animateWithDuration(0.7, delay: 0.2, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            
+            self.circleView.alpha = 0.2
+            self.circleView.frame = imageViewNewFrame
+            
+            }, completion: {(value: Bool) in
+                println("complete")
+                
+                //add confirmButton
+                
+                self.scheduleLocalNotification()
+                self.setUpCameraView()
+                self.addActionButtons()
+                
+        })
+        
+    }
+    
+    func trashImage(sender: UIButton){
+        
+    }
+
     
     func addGestureRecognizerToOverlayView(){
         let swipeUp = UITapGestureRecognizer(target: self, action: Selector("takePictureTwo:"))
@@ -249,19 +392,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
 
     
-    func dismissCalendar(sender: UIButton){
-        println("scheduling")
-        if (snap != nil) {
-            animator.removeBehavior(snap)
-        }
-        
-        self.shrinkCalendarPicker()
-        
-        self.schedulePhoto()
-        
-        self.resetCameraViewAndMenu()
-        
-    }
     
     func updateScheduleText(){
         
@@ -291,96 +421,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
 
 
     
-    func resetCameraViewAndMenu(){
-        
-        
-        self.didTakePicture = false
-        
-        if (circleView? != nil){
-            circleView.removeFromSuperview()
-        }
-        
-        if (imageView? != nil){
-            imageView.removeFromSuperview()
-        }
-        
-        if (scheduleText? != nil){
-            scheduleText.removeFromSuperview()
-        }
-        if (okButton? != nil){
-            okButton.removeFromSuperview()
-        }
-        if (calendarPicker? != nil){
-            calendarPicker.removeFromSuperview()
-        }
-        if (calendarPickerLabel? != nil){
-            calendarPickerLabel.removeFromSuperview()
-        }
-        
-        if (backgroundImageView? != nil){
-            backgroundImageView.removeFromSuperview()
-        }
-        
-        if (inboxButton? != nil){
-            inboxButton.removeFromSuperview()
-        }
-        
-        if (libraryButton? != nil) {
-            libraryButton.removeFromSuperview()
-        }
-        
-        let imagePickerControllerFrame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height+20)
-        imagePickerController.view.frame = imagePickerControllerFrame;
 
-                let translate = CGAffineTransformMakeTranslation(0, 83.0)
-                self.imagePickerController.cameraViewTransform = translate
-        
-                let scale = CGAffineTransformScale(translate, 1.333333, 1.333333)
-              //  let scale = CGAffineTransformMakeScale(1.3, 1.3)
-                self.imagePickerController.cameraViewTransform = scale
-        imageView = imagePickerController.view
-        imageView.layer.cornerRadius = 0
-        self.view.addSubview(imageView)
-        
-        inboxButton = UIButton(frame: CGRectMake(20,self.view.frame.height-60, 30, 30))
-        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
-        let inboxButtonImage = UIImage(named: "inboxButtonImage")
-        inboxButton.setImage(inboxButtonImage, forState: .Normal)
-        inboxButton.alpha = 1
-        view.addSubview(inboxButton)
-        
-        libraryButton = UIButton(frame: CGRectMake(self.view.frame.width-70,self.view.frame.height-60, 30, 30))
-        inboxButton.addTarget(self, action: Selector("swipeView:"), forControlEvents:UIControlEvents.TouchUpInside)
-        let libraryButtomImage = UIImage(named: "libraryButtonImage")
-        libraryButton.setImage(libraryButtomImage, forState: .Normal)
-        libraryButton.alpha = 1
-        view.addSubview(libraryButton)
-        
-        scheduleText = UILabel(frame: CGRect(x: 10, y: 40, width: 100, height: 40))
-        scheduleText.alpha = 1
-        scheduleText.font = UIFont(name: "ArialRoundedMTBold", size: 40.0)
-        scheduleText.textColor = UIColor.blackColor()
-        view.addSubview(scheduleText)
-        
-        circleView = UIImageView(frame: CGRect(x: self.view.frame.width/2-circleRadius, y: self.view.frame.height-210, width: circleRadius*2, height: circleRadius*2))
-        circleView.clipsToBounds = true
-        circleView.image = UIImage(named: "snapbuttonvector")
-        circleView.layer.cornerRadius = circleRadius
-        circleView.userInteractionEnabled = true
-        circleView.layer.zPosition = 10
-        circleView.alpha = 1
-        originalCirclePoint = circleView.center
-        view.addSubview(circleView)
-        
-        backgroundImageView = UIImageView(frame: CGRectMake(0,667-1836,375,1836))
-        backgroundImageView.image = UIImage(named: "whiteBackgroundImage")
-        backgroundImageView.alpha = 0
-        self.view.addSubview(backgroundImageView)
-
-        
-
-        
-    }
     
     func showImagePickerForSourceType(sourceType: UIImagePickerControllerSourceType){
         
@@ -445,9 +486,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         didTakePicture = true
         
         
-        view.addSubview(calendarPicker)
-        calendarPicker.addSubview(calendarPickerLabel)
-        
         libraryButton.alpha = 0
         inboxButton.alpha = 0
     }
@@ -484,9 +522,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             }, completion:nil)
         didTakePicture = true
 
-        
-        view.addSubview(calendarPicker)
-        calendarPicker.addSubview(calendarPickerLabel)
         
         libraryButton.alpha = 0
         inboxButton.alpha = 0
@@ -568,7 +603,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             }, completion: {(value: Bool) in
                 
                 self.schedulePhoto()
-                self.resetCameraViewAndMenu()
+                self.setUpCameraView()
+                self.addActionButtons()
                 
                 
         })
@@ -638,6 +674,14 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
 
 
+    func loadInboxVC(){
+        println("presenting")
+        let pvc = self.storyboard!.instantiateViewControllerWithIdentifier("PageViewController") as PageViewController
+        let ivc = self.storyboard!.instantiateViewControllerWithIdentifier("InboxViewController") as InboxViewController
+        //   ivc.modalTransitionStyle = UIModalTransitionStyle.CrossDissolve
+        // pvc.setViewControllers([ivc], direction: UIPageViewControllerNavigationDirection.Reverse, animated: true, completion: nil)
+        self.presentViewController(ivc, animated: true, completion: nil)
+    }
     
     func swipeView(sender: UIButton){
         let pvc = self.storyboard!.instantiateViewControllerWithIdentifier("PageViewController") as PageViewController
